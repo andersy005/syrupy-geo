@@ -110,13 +110,16 @@
     ]
 
 [tool.pixi.feature.dev.dependencies]
+    build      = ">=1.0"
     pre-commit = ">=4.5.1,<5"
     pytest     = ">=8.0.2,<9"
     pytest-cov = ">=6.0.0,<8"
     ruff       = ">=0.15.4,<0.16"
+    twine      = ">=6.1"
 
 [tool.pixi.feature.dev.tasks]
-    build             = "python -m build"
+    build             = "python -m build --sdist --wheel ."
+    check-dist        = "twine check dist/*"
     format            = "ruff format . && ruff check --fix ."
     lint              = "pre-commit run --all-files"
     publish           = "python -m twine upload dist/*"
@@ -141,8 +144,8 @@
     py313   = ["dev", "py313"]
 
 [tool.pixi.dependencies]
-    geopandas         = ">=1.1.2,<2"
-    pyarrow           = ">=15.0.0"
-    s3fs              = ">=2024.1.0"
-    xarray            = ">=2026.2.0,<2027"
-    zarr              = ">=3.1.5,<4"
+    geopandas = ">=1.1.2,<2"
+    pyarrow   = ">=15.0.0"
+    s3fs      = ">=2024.1.0"
+    xarray    = ">=2026.2.0,<2027"
+    zarr      = ">=3.1.5,<4"
