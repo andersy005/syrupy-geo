@@ -12,9 +12,21 @@
     requires      = ["setuptools-scm[toml]>=6.2", "setuptools>=64", "wheel"]
 
 [project]
+    dependencies    = ["syrupy>=5,<6", "universal-pathlib>=0.2"]
     dynamic         = ["version"]
     name            = "syrupy-geo"
-    requires-python = ">= 3.12"
+    requires-python = ">= 3.11"
+
+[project.optional-dependencies]
+    all    = ["syrupy-geo[geo]", "syrupy-geo[xarray]"]
+    geo    = ["geopandas>=1.0", "pyarrow>=15"]
+    xarray = ["xarray>=2024.1", "zarr>=3"]
+
+[project.entry-points."pytest11"]
+    syrupy-geo = "syrupy_geo.plugin"
+
+[tool.setuptools.packages.find]
+    include = ["syrupy_geo*"]
 
 [tool.setuptools_scm]
     fallback_version = "999"
@@ -57,7 +69,7 @@
     ]
     extend-include = ["*.ipynb"]
     line-length = 100
-    target-version = "py312"
+    target-version = "py311"
 
 [tool.ruff.lint]
     ignore = [
@@ -89,9 +101,36 @@
     addopts = [
         "--cov-report=term-missing",
         "--cov-report=xml",
-        "--cov=./ocr",
+        "--cov=syrupy_geo",
         "--verbose",
     ]
     console_output_style = "count"
+    markers = [
+        "integration: marks tests as integration tests (deselect with '-m not integration')",
+    ]
 
-[tool.pixi.tasks]
+[tool.pixi.feature.dev.dependencies]
+    pre-commit = ">=4.5.1,<5"
+    pytest     = ">=8.0.2,<9"
+    pytest-cov = ">=6.0.0,<8"
+    ruff       = ">=0.15.4,<0.16"
+
+[tool.pixi.feature.dev.tasks]
+    build             = "python -m build"
+    format            = "ruff format . && ruff check --fix ."
+    lint              = "pre-commit run --all-files"
+    publish           = "python -m twine upload dist/*"
+    run-ruff-check    = "ruff check ."
+    tests             = "pytest tests/ -m 'not integration'"
+    tests-integration = "pytest tests/ -m integration"
+
+[tool.pixi.environments]
+    default = ["dev"]
+    dev     = ["dev"]
+
+[tool.pixi.dependencies]
+    geopandas         = ">=1.1.2,<2"
+    pyarrow           = ">=15.0.0"
+    s3fs              = ">=2024.1.0"
+    xarray            = ">=2026.2.0,<2027"
+    zarr              = ">=3.1.5,<4"

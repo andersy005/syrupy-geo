@@ -1,5 +1,7 @@
-# flake8: noqa
 import importlib.metadata
 
-# get the version of the package
-__version__ = importlib.metadata.version('srm')
+from .geodataframe import GeoDataFrameSnapshotExtension
+from .xarray import XarraySnapshotExtension
+
+__version__ = importlib.metadata.version('syrupy-geo')
+__all__ = ['XarraySnapshotExtension', 'GeoDataFrameSnapshotExtension']
