@@ -124,9 +124,21 @@
     tests             = "pytest tests/ -m 'not integration'"
     tests-integration = "pytest tests/ -m integration"
 
+[tool.pixi.feature.py311.dependencies]
+    python = "3.11.*"
+
+[tool.pixi.feature.py312.dependencies]
+    python = "3.12.*"
+
+[tool.pixi.feature.py313.dependencies]
+    python = "3.13.*"
+
 [tool.pixi.environments]
     default = ["dev"]
     dev     = ["dev"]
+    py311   = ["dev", "py311"]
+    py312   = ["dev", "py312"]
+    py313   = ["dev", "py313"]
 
 [tool.pixi.dependencies]
     geopandas         = ">=1.1.2,<2"

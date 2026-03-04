@@ -12,30 +12,29 @@ concurrency:
 
 jobs:
   tests:
-    name: tests (python ${{ matrix.python-version }})
+    name: tests (${{ matrix.env }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        env: [py311, py312, py313]
 
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@v0.9.4
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: pip install ".[all]" pytest pytest-cov
+          pixi-version: latest
+          cache: true
+          environments: ${{ matrix.env }}
 
       - name: Run unit tests
-        run: pytest tests/ -m 'not integration'
+        run: pixi run --environment ${{ matrix.env }} tests
 
       - name: Upload coverage
         uses: codecov/codecov-action@v5
-        if: matrix.python-version == '3.12'
+        if: matrix.env == 'py312'
         with:
           files: coverage.xml
           fail_ci_if_error: false
