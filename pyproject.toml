@@ -12,10 +12,43 @@
     requires      = ["setuptools-scm[toml]>=6.2", "setuptools>=64", "wheel"]
 
 [project]
-    dependencies    = ["syrupy>=5,<6", "universal-pathlib>=0.2"]
-    dynamic         = ["version"]
-    name            = "syrupy-geo"
+    authors = [{ name = "Anderson Banihirwe" }]
+    classifiers = [
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Topic :: Scientific/Engineering :: GIS",
+        "Topic :: Software Development :: Testing",
+    ]
+    dependencies = ["syrupy>=5,<6", "universal-pathlib>=0.2"]
+    description = "Syrupy snapshot testing extension for geospatial data (xarray/zarr, geopandas/parquet)"
+    dynamic = ["version"]
+    keywords = [
+        "geopandas",
+        "geospatial",
+        "parquet",
+        "snapshot",
+        "syrupy",
+        "testing",
+        "xarray",
+        "zarr",
+    ]
+    license = { text = "MIT" }
+    name = "syrupy-geo"
+    readme = "README.md"
     requires-python = ">= 3.11"
+
+[project.urls]
+    "Bug Tracker" = "https://github.com/andersy005/syrupy-geo/issues"
+    "Changelog"   = "https://github.com/andersy005/syrupy-geo/releases"
+    "Homepage"    = "https://github.com/andersy005/syrupy-geo"
+    "Repository"  = "https://github.com/andersy005/syrupy-geo"
 
 [project.optional-dependencies]
     all    = ["syrupy-geo[geo]", "syrupy-geo[xarray]"]
