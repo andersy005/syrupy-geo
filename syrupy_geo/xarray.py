@@ -73,10 +73,15 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
         try:
             import xarray as xr
             import zarr
-
+        except ImportError as e:
+            raise ImportError(
+                'xarray and zarr are required for XarraySnapshotExtension. '
+                'Install them with: pip install syrupy-geo[icechunk]'
+            ) from e
+        try:
             store = self.__class__._get_readonly_store()
             z = zarr.open_group(store=store, path=snapshot_location)
-            type_tag = z.attrs.get('_syrupy_geo_type', 'datatree')
+            type_tag = z.attrs.get('_syrupy_geo_type', 'dataset')
             if type_tag == 'dataset':
                 return xr.open_dataset(store, engine='zarr', group=snapshot_location)
             return xr.open_datatree(store, engine='zarr', group=snapshot_location)
@@ -90,7 +95,7 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
             import zarr
         except ImportError as e:
             raise ImportError(
-                'xarray, zarr, and icechunk are required for XarraySnapshotExtension. '
+                'xarray and zarr are required for XarraySnapshotExtension. '
                 'Install them with: pip install syrupy-geo[icechunk]'
             ) from e
 
