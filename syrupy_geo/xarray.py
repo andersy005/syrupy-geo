@@ -20,11 +20,19 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
     _repo: ClassVar[Any] = None
     _session: ClassVar[Any] = None
     _has_pending_writes: ClassVar[bool] = False
+    # Captured on first get_location call; used to place the icechunk repo adjacent
+    # to the test files (e.g. tests/__snapshots__/icechunk) when SNAPSHOT_STORAGE_PATH
+    # is not set.
+    _snapshot_root_dir: ClassVar[upath.UPath | None] = None
 
     @classmethod
     def get_location(cls, *, test_location: PyTestLocation, index: SnapshotIndex = 0) -> str:
         stem = upath.UPath(test_location.filepath).stem
         name = cls.get_snapshot_name(test_location=test_location, index=index)
+        # Capture the snapshot root directory from the test file location so that
+        # _get_icechunk_repo_path can place the repo adjacent to the test files.
+        if cls._snapshot_root_dir is None and cls._get_base_snapshot_path() is None:
+            cls._snapshot_root_dir = upath.UPath(test_location.filepath).parent / '__snapshots__'
         return f'{stem}/{name}'
 
     @classmethod
@@ -80,7 +88,7 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
             ) from e
         try:
             store = self.__class__._get_readonly_store()
-            z = zarr.open_group(store=store, path=snapshot_location)
+            z = zarr.open_group(store=store, path=snapshot_location, mode='r')
             type_tag = z.attrs.get('_syrupy_geo_type', 'dataset')
             if type_tag == 'dataset':
                 return xr.open_dataset(store, engine='zarr', group=snapshot_location)
@@ -109,7 +117,12 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
                 'dataset'
             )
         elif isinstance(data, xr.DataTree):
-            data.to_zarr(store, group=group_path, mode='w')
+            # xr.DataTree.to_zarr() does not support the group= parameter, so write each
+            # node's Dataset manually at the correct sub-path within the icechunk store.
+            for rel_path, node in data.subtree_with_keys:
+                node_ds = node.to_dataset(inherit=False)
+                node_group_path = group_path if rel_path == '.' else f'{group_path}/{rel_path}'
+                node_ds.to_zarr(store, group=node_group_path, mode='w')
             zarr.open_group(store=store, path=group_path, mode='a').attrs['_syrupy_geo_type'] = (
                 'datatree'
             )
@@ -143,8 +156,11 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
     @classmethod
     def _get_icechunk_repo_path(cls) -> str:
         base = cls._get_base_snapshot_path()
-        root = base if base else upath.UPath('__snapshots__')
-        return str(root / 'icechunk')
+        if base:
+            return str(base / 'icechunk')
+        if cls._snapshot_root_dir is not None:
+            return str(cls._snapshot_root_dir / 'icechunk')
+        return str(upath.UPath('__snapshots__') / 'icechunk')
 
     @classmethod
     def _get_repo(cls) -> typing.Any:
@@ -183,4 +199,6 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
         if cls._session is not None and cls._has_pending_writes:
             cls._session.commit(message)
         cls._session = None
+        cls._repo = None
+        cls._snapshot_root_dir = None
         cls._has_pending_writes = False
