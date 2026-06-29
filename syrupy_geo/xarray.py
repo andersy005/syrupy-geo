@@ -29,8 +29,6 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
     def get_location(cls, *, test_location: PyTestLocation, index: SnapshotIndex = 0) -> str:
         stem = upath.UPath(test_location.filepath).stem
         name = cls.get_snapshot_name(test_location=test_location, index=index)
-        # Capture the snapshot root directory from the test file location so that
-        # _get_icechunk_repo_path can place the repo adjacent to the test files.
         if cls._snapshot_root_dir is None and cls._get_base_snapshot_path() is None:
             cls._snapshot_root_dir = upath.UPath(test_location.filepath).parent / '__snapshots__'
         return f'{stem}/{name}'
@@ -196,9 +194,11 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
 
     @classmethod
     def commit_session(cls, message: str) -> None:
-        if cls._session is not None and cls._has_pending_writes:
-            cls._session.commit(message)
-        cls._session = None
-        cls._repo = None
-        cls._snapshot_root_dir = None
-        cls._has_pending_writes = False
+        try:
+            if cls._session is not None and cls._has_pending_writes:
+                cls._session.commit(message)
+        finally:
+            cls._session = None
+            cls._repo = None
+            cls._snapshot_root_dir = None
+            cls._has_pending_writes = False
