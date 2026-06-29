@@ -29,3 +29,17 @@ def sample_geodataframe():
         geometry=[Point(0, 0), Point(1, 1), Point(2, 2)],
         crs='EPSG:4326',
     )
+
+
+@pytest.fixture
+def sample_datatree():
+    import numpy as np
+    import xarray as xr
+
+    rng = np.random.default_rng(42)
+    return xr.DataTree.from_dict(
+        {
+            'group_a': xr.Dataset({'temp': ('x', rng.random(4))}),
+            'group_b': xr.Dataset({'precip': ('y', rng.random(3))}),
+        }
+    )
