@@ -84,8 +84,8 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
                 'xarray and zarr are required for XarraySnapshotExtension. '
                 'Install them with: pip install syrupy-geo[icechunk]'
             ) from e
+        store = self.__class__._get_readonly_store()
         try:
-            store = self.__class__._get_readonly_store()
             z = zarr.open_group(store=store, path=snapshot_location, mode='r')
             type_tag = z.attrs.get('_syrupy_geo_type', 'dataset')
             if type_tag == 'dataset':
@@ -99,31 +99,35 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
         try:
             import xarray as xr
             import zarr
+            from icechunk.xarray import to_icechunk as _to_icechunk
         except ImportError as e:
             raise ImportError(
-                'xarray and zarr are required for XarraySnapshotExtension. '
+                'xarray, zarr, and icechunk are required for XarraySnapshotExtension. '
                 'Install them with: pip install syrupy-geo[icechunk]'
             ) from e
 
         data = next(iter(snapshot_collection)).data
         group_path = snapshot_collection.location
-        store = cls._get_writable_session().store
 
         if isinstance(data, xr.Dataset):
-            data.to_zarr(store, group=group_path, mode='w')
-            zarr.open_group(store=store, path=group_path, mode='a').attrs['_syrupy_geo_type'] = (
-                'dataset'
-            )
+            session = cls._get_writable_session()
+            _to_icechunk(data, session, group=group_path, mode='w')
+            zarr.open_group(store=session.store, path=group_path, mode='a').attrs[
+                '_syrupy_geo_type'
+            ] = 'dataset'
         elif isinstance(data, xr.DataTree):
-            # xr.DataTree.to_zarr() does not support the group= parameter, so write each
-            # node's Dataset manually at the correct sub-path within the icechunk store.
+            session = cls._get_writable_session()
+            # Clear existing subtree first to remove stale groups when DataTree structure changes.
+            # xr.DataTree.to_zarr() does not support the group= parameter in xarray 2026.2.0,
+            # so write each node's Dataset manually.
+            zarr.open_group(store=session.store, path=group_path, mode='w')
             for rel_path, node in data.subtree_with_keys:
                 node_ds = node.to_dataset(inherit=False)
                 node_group_path = group_path if rel_path == '.' else f'{group_path}/{rel_path}'
-                node_ds.to_zarr(store, group=node_group_path, mode='w')
-            zarr.open_group(store=store, path=group_path, mode='a').attrs['_syrupy_geo_type'] = (
-                'datatree'
-            )
+                _to_icechunk(node_ds, session, group=node_group_path, mode='a')
+            zarr.open_group(store=session.store, path=group_path, mode='a').attrs[
+                '_syrupy_geo_type'
+            ] = 'datatree'
 
         cls._has_pending_writes = True
 
@@ -158,7 +162,9 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
             return str(base / 'icechunk')
         if cls._snapshot_root_dir is not None:
             return str(cls._snapshot_root_dir / 'icechunk')
-        return str(upath.UPath('__snapshots__') / 'icechunk')
+        raise RuntimeError(
+            '_snapshot_root_dir was never set; call get_location before reading or writing'
+        )
 
     @classmethod
     def _get_repo(cls) -> typing.Any:
