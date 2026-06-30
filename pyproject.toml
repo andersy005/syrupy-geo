@@ -5,7 +5,7 @@
     platforms = ["linux-64", "osx-arm64"]
 
 [tool.pixi.pypi-dependencies]
-    icechunk   = ">=0.1"
+    icechunk   = ">=2.0"
     syrupy-geo = { path = ".", editable = true }
 
 [build-system]
@@ -43,7 +43,7 @@
     license = { text = "MIT" }
     name = "syrupy-geo"
     readme = "README.md"
-    requires-python = ">= 3.11"
+    requires-python = ">= 3.12"
 
 [project.urls]
     "Bug Tracker" = "https://github.com/andersy005/syrupy-geo/issues"
@@ -162,9 +162,6 @@
     tests             = "pytest tests/ -m 'not integration'"
     tests-integration = "pytest tests/ -m integration"
 
-[tool.pixi.feature.py311.dependencies]
-    python = "3.11.*"
-
 [tool.pixi.feature.py312.dependencies]
     python = "3.12.*"
 
@@ -174,7 +171,6 @@
 [tool.pixi.environments]
     default = ["dev"]
     dev     = ["dev"]
-    py311   = ["dev", "py311"]
     py312   = ["dev", "py312"]
     py313   = ["dev", "py313"]
 
