@@ -44,7 +44,9 @@ syrupy-geo prints what the snapshot contains and what the test produced, so you 
 
 ## Commit updated snapshots
 
-Snapshot files are part of your codebase. After updating, commit them together with the code change that caused them to differ:
+Snapshots are part of your codebase. After updating, commit them together with the code change that caused them to differ.
+
+For xarray snapshots, the icechunk repository at `tests/__snapshots__/icechunk/` is updated in-place and a new versioned commit is created automatically by `pytest_sessionfinish`. Commit the updated repository files:
 
 ```bash
 git add tests/__snapshots__/

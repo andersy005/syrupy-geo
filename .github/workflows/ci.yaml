@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: [py311, py312, py313]
+        env: [py312, py313, py314]
 
     steps:
       - uses: actions/checkout@v6
@@ -34,7 +34,7 @@ jobs:
 
       - name: Upload coverage
         uses: codecov/codecov-action@v6
-        if: matrix.env == 'py312'
+        if: matrix.env == 'py313'
         with:
           files: coverage.xml
           fail_ci_if_error: false

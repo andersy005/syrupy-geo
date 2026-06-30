@@ -2,7 +2,7 @@
 
 syrupy-geo is a [syrupy](https://github.com/syrupy-project/syrupy) extension package for geospatial and array data formats. It adds snapshot testing support for:
 
-- **xarray** `DataArray` and `Dataset` objects, stored as Zarr
+- **xarray** `DataArray`, `Dataset`, and `DataTree` objects, stored in a versioned [icechunk](https://icechunk.io) repository
 - **GeoPandas** `GeoDataFrame` objects, stored as GeoParquet
 
 Snapshots can live on a local filesystem or on any fsspec-compatible remote storage (S3, GCS, ADLS) by setting a single environment variable.
@@ -10,8 +10,8 @@ Snapshots can live on a local filesystem or on any fsspec-compatible remote stor
 ## Install
 
 ```bash
-# xarray support
-pip install "syrupy-geo[xarray]"
+# xarray + DataTree support (icechunk-backed)
+pip install "syrupy-geo[icechunk]"
 
 # GeoPandas support
 pip install "syrupy-geo[geo]"
@@ -20,7 +20,7 @@ pip install "syrupy-geo[geo]"
 pip install "syrupy-geo[all]"
 ```
 
-Python 3.11 or later is required.
+Python 3.12 or later is required.
 
 ## Quick example
 
@@ -34,6 +34,18 @@ def test_my_array(xarray_snapshot):
     rng = np.random.default_rng(42)
     da = xr.DataArray(rng.random((3, 4)), dims=["x", "y"])
     assert xarray_snapshot == da  # snapshot on the left
+
+
+def test_my_datatree(xarray_snapshot):
+    import numpy as np
+    import xarray as xr
+
+    rng = np.random.default_rng(42)
+    dt = xr.DataTree.from_dict({
+        'temperature': xr.Dataset({'t': ('x', rng.random(4))}),
+        'precipitation': xr.Dataset({'p': ('y', rng.random(3))}),
+    })
+    assert xarray_snapshot == dt  # snapshot on the left
 
 
 def test_my_geodataframe(geodataframe_snapshot):

@@ -5,6 +5,7 @@
     platforms = ["linux-64", "osx-arm64"]
 
 [tool.pixi.pypi-dependencies]
+    icechunk   = ">=2.0"
     syrupy-geo = { path = ".", editable = true }
 
 [build-system]
@@ -20,7 +21,6 @@
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
         "Topic :: Scientific/Engineering :: GIS",
@@ -42,7 +42,7 @@
     license = { text = "MIT" }
     name = "syrupy-geo"
     readme = "README.md"
-    requires-python = ">= 3.11"
+    requires-python = ">= 3.12"
 
 [project.urls]
     "Bug Tracker" = "https://github.com/andersy005/syrupy-geo/issues"
@@ -51,9 +51,10 @@
     "Repository"  = "https://github.com/andersy005/syrupy-geo"
 
 [project.optional-dependencies]
-    all    = ["syrupy-geo[geo]", "syrupy-geo[xarray]"]
-    geo    = ["geopandas>=1.0", "pyarrow>=15"]
-    xarray = ["xarray>=2024.1", "zarr>=3"]
+    all      = ["syrupy-geo[geo]", "syrupy-geo[icechunk]", "syrupy-geo[xarray]"]
+    geo      = ["geopandas>=1.0", "pyarrow>=15"]
+    icechunk = ["icechunk>=2.0", "xarray>=2026.2", "zarr>=3"]
+    xarray   = ["icechunk>=2.0", "xarray>=2026.2", "zarr>=3"]
 
 [project.entry-points."pytest11"]
     syrupy-geo = "syrupy_geo.plugin"
@@ -102,7 +103,7 @@
     ]
     extend-include = ["*.ipynb"]
     line-length = 100
-    target-version = "py311"
+    target-version = "py312"
 
 [tool.ruff.lint]
     ignore = [
@@ -160,21 +161,21 @@
     tests             = "pytest tests/ -m 'not integration'"
     tests-integration = "pytest tests/ -m integration"
 
-[tool.pixi.feature.py311.dependencies]
-    python = "3.11.*"
-
 [tool.pixi.feature.py312.dependencies]
     python = "3.12.*"
 
 [tool.pixi.feature.py313.dependencies]
     python = "3.13.*"
 
+[tool.pixi.feature.py314.dependencies]
+    python = "3.14.*"
+
 [tool.pixi.environments]
     default = ["dev"]
     dev     = ["dev"]
-    py311   = ["dev", "py311"]
     py312   = ["dev", "py312"]
     py313   = ["dev", "py313"]
+    py314   = ["dev", "py314"]
 
 [tool.pixi.dependencies]
     geopandas = ">=1.1.2,<2"

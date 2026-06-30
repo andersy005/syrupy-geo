@@ -1,21 +1,21 @@
-# Snapshot test an xarray DataArray
+# Snapshot test xarray objects
 
-This tutorial walks you through writing your first snapshot test for an xarray `DataArray` using syrupy-geo. By the end you will have a passing test and a snapshot stored on disk.
+This tutorial walks you through writing your first snapshot tests for xarray objects using syrupy-geo. By the end you will have passing tests and snapshots stored in a versioned icechunk repository.
 
 ## Prerequisites
 
-- Python 3.11 or later
+- Python 3.12 or later
 - A project with pytest already set up
 
 ## Install
 
 ```bash
-pip install "syrupy-geo[xarray]"
+pip install "syrupy-geo[icechunk]"
 ```
 
-This installs syrupy-geo along with xarray and zarr.
+This installs syrupy-geo along with xarray, zarr, and icechunk.
 
-## Write the test
+## Test a DataArray
 
 Create a test file, for example `tests/test_climate.py`:
 
@@ -47,7 +47,12 @@ Run pytest with the `--snapshot-update` flag to write the snapshot for the first
 pytest --snapshot-update tests/test_climate.py
 ```
 
-Pytest will create a directory `tests/__snapshots__/test_climate/` and write a file named `test_temperature_array.zarr` inside it. This file is your snapshot and should be committed to version control.
+syrupy-geo creates an icechunk repository at `tests/__snapshots__/icechunk/` (if it does not already exist) and writes the snapshot as a zarr group inside it. At the end of the session, it commits all changes to the repository with a timestamp message. Commit this repository to version control:
+
+```bash
+git add tests/__snapshots__/icechunk/
+git commit -m "add temperature snapshot"
+```
 
 ## Run the test
 
@@ -74,6 +79,22 @@ def test_climate_dataset(xarray_snapshot):
     )
     assert xarray_snapshot == ds
 ```
+
+## Test a DataTree
+
+`xr.DataTree` objects are stored natively and read back as a `DataTree`:
+
+```python
+def test_climate_tree(xarray_snapshot):
+    rng = np.random.default_rng(42)
+    dt = xr.DataTree.from_dict({
+        'surface': xr.Dataset({'temperature': ('x', rng.random(4))}),
+        'upper_air': xr.Dataset({'geopotential': ('z', rng.random(8))}),
+    })
+    assert xarray_snapshot == dt
+```
+
+The tree structure is preserved across the round-trip. If you later change the tree structure (add or remove groups), run `--snapshot-update` to regenerate the snapshot — old groups in the repository are automatically cleaned up.
 
 ## Next steps
 
