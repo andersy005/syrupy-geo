@@ -167,11 +167,15 @@
 [tool.pixi.feature.py313.dependencies]
     python = "3.13.*"
 
+[tool.pixi.feature.py314.dependencies]
+    python = "3.14.*"
+
 [tool.pixi.environments]
     default = ["dev"]
     dev     = ["dev"]
     py312   = ["dev", "py312"]
     py313   = ["dev", "py313"]
+    py314   = ["dev", "py314"]
 
 [tool.pixi.dependencies]
     geopandas = ">=1.1.2,<2"
