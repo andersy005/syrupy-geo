@@ -17,13 +17,12 @@ def test_array_by_size(xarray_snapshot, size):
     assert xarray_snapshot == da
 ```
 
-syrupy-geo sanitizes the parameter into the snapshot file name. For the three cases above, the snapshots will be:
+syrupy-geo sanitizes the parameter into the snapshot group path. For the three cases above, the snapshots will be stored in the icechunk repository at paths:
 
 ```
-tests/__snapshots__/test_climate/
-    test_array_by_size_4.zarr
-    test_array_by_size_8.zarr
-    test_array_by_size_16.zarr
+test_climate/test_array_by_size_4
+test_climate/test_array_by_size_8
+test_climate/test_array_by_size_16
 ```
 
 ## Parametrize over multiple independent arguments

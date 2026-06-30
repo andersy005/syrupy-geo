@@ -42,9 +42,10 @@ Install only what you need.
 
 | Extra | Packages installed | Use when |
 |---|---|---|
-| `syrupy-geo[xarray]` | xarray >= 2024.1, zarr >= 3 | Testing xarray objects |
+| `syrupy-geo[icechunk]` | icechunk >= 2.0, xarray >= 2026.2, zarr >= 3 | Testing xarray DataArray, Dataset, and DataTree objects (icechunk-backed) |
+| `syrupy-geo[xarray]` | icechunk >= 2.0, xarray >= 2026.2, zarr >= 3 | Alias for `[icechunk]` |
 | `syrupy-geo[geo]` | geopandas >= 1.0, pyarrow >= 15 | Testing GeoDataFrames |
-| `syrupy-geo[all]` | Both of the above | Testing both |
+| `syrupy-geo[all]` | All of the above | Testing both |
 
 ## pytest plugin entry point
 

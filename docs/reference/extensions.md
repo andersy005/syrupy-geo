@@ -6,9 +6,9 @@
 from syrupy_geo import XarraySnapshotExtension
 ```
 
-Stores xarray `DataArray` and `Dataset` objects as Zarr stores. Each snapshot is a directory containing a valid Zarr v3 hierarchy.
+Stores xarray `DataArray`, `Dataset`, and `DataTree` objects in a versioned [icechunk](https://icechunk.io) repository. Each snapshot is a zarr group inside the repository at path `<test_stem>/<test_name>`.
 
-**Requires:** `pip install "syrupy-geo[xarray]"` (xarray >= 2024.1, zarr >= 3)
+**Requires:** `pip install "syrupy-geo[icechunk]"` (icechunk >= 2.0, xarray >= 2026.2, zarr >= 3)
 
 ### Fixture
 
@@ -23,21 +23,36 @@ The `xarray_snapshot` fixture is registered automatically. No `conftest.py` chan
 
 | Type | Behaviour |
 |---|---|
-| `xr.DataArray` | Converted to a single-variable `Dataset` named `"data"` before writing |
+| `xr.DataArray` | Converted to a single-variable `Dataset` using `data.name` (falls back to `'data'`) before writing |
 | `xr.Dataset` | Written as-is |
+| `xr.DataTree` | Written node-by-node; each child stored as a Dataset group at the corresponding sub-path |
 | Anything else | `TypeError` raised immediately |
 
 ### Equality check
 
-Two datasets are considered equal if `xr.testing.assert_allclose` passes with `rtol=1e-6` and `atol=1e-8`. If that fails, the check falls back to `xr.testing.assert_equal` for exact equality. If both fail, the test fails.
+Two objects are considered equal if `xr.testing.assert_allclose` passes with `rtol=1e-6` and `atol=1e-8`. If that fails, the check falls back to `xr.testing.assert_equal` for exact equality. If both fail, the test fails.
+
+Type mismatches (e.g., comparing a `Dataset` read-back to a `DataTree`) are caught before numerical comparison and return `False` immediately.
 
 ### Storage format
 
-Snapshots are written as Zarr v3 stores using `Dataset.to_zarr`. The store is a directory (local) or a prefix (S3). An existing snapshot is deleted before writing to avoid stale chunks.
+All snapshots for a project share a single icechunk repository at `tests/__snapshots__/icechunk/` (or `$SNAPSHOT_STORAGE_PATH/icechunk/` when the environment variable is set). Within the repository, each snapshot is a zarr group tagged with a `_syrupy_geo_type` attribute (`'dataset'` or `'datatree'`) so the correct reader is used on read-back.
+
+After a `--snapshot-update` run, `pytest_sessionfinish` commits all changes to the icechunk repository as one versioned commit. Read-only runs produce no commit.
 
 ### File extension
 
-`zarr` (no leading dot)
+`icechunk` (used as the zarr group path suffix in syrupy's internal routing; the actual storage is the shared icechunk repository)
+
+### Snapshot location
+
+Snapshots are stored as zarr groups with paths of the form:
+
+```
+<test_file_stem>/<sanitized_test_name>
+```
+
+For example, a test `test_temperature_array` in `tests/test_climate.py` is stored at group path `test_climate/test_temperature_array` within the icechunk repository.
 
 ---
 

@@ -21,7 +21,7 @@ You can set this in your shell, in a CI environment variable, or in a `.env` fil
 pytest --snapshot-update
 ```
 
-Snapshots are written directly to S3. For xarray they are stored as Zarr stores; for GeoDataFrames as GeoParquet files.
+Snapshots are written directly to S3. For xarray they are stored in an icechunk repository at `$SNAPSHOT_STORAGE_PATH/icechunk/`; for GeoDataFrames as GeoParquet files at `$SNAPSHOT_STORAGE_PATH/<test_stem>/<name>.parquet`.
 
 ## Run tests against remote snapshots
 
