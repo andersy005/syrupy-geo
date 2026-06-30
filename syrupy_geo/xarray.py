@@ -35,6 +35,7 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
 
     @classmethod
     def dirname(cls, *, test_location: PyTestLocation) -> str:
+        # Used by syrupy's --snapshot-purge path resolution; not called during normal read/write.
         return upath.UPath(test_location.filepath).stem
 
     def serialize(self, data: SerializableData, **kwargs: typing.Any) -> typing.Any:
@@ -128,6 +129,8 @@ class XarraySnapshotExtension(BaseGeoSnapshotExtension):
             zarr.open_group(store=session.store, path=group_path, mode='a').attrs[
                 '_syrupy_geo_type'
             ] = 'datatree'
+        else:
+            raise TypeError(f'Expected xr.Dataset or xr.DataTree, got {type(data)}')
 
         cls._has_pending_writes = True
 
