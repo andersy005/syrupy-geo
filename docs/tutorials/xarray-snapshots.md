@@ -28,8 +28,8 @@ def test_temperature_array(xarray_snapshot):
     rng = np.random.default_rng(42)
     da = xr.DataArray(
         rng.random((3, 4)),
-        dims=["lat", "lon"],
-        name="temperature",
+        dims=['lat', 'lon'],
+        name='temperature',
     )
     assert xarray_snapshot == da
 ```
@@ -73,8 +73,8 @@ def test_climate_dataset(xarray_snapshot):
     rng = np.random.default_rng(42)
     ds = xr.Dataset(
         {
-            "temperature": (["lat", "lon"], rng.random((3, 4))),
-            "precipitation": (["lat", "lon"], rng.random((3, 4))),
+            'temperature': (['lat', 'lon'], rng.random((3, 4))),
+            'precipitation': (['lat', 'lon'], rng.random((3, 4))),
         }
     )
     assert xarray_snapshot == ds
@@ -87,10 +87,12 @@ def test_climate_dataset(xarray_snapshot):
 ```python
 def test_climate_tree(xarray_snapshot):
     rng = np.random.default_rng(42)
-    dt = xr.DataTree.from_dict({
-        'surface': xr.Dataset({'temperature': ('x', rng.random(4))}),
-        'upper_air': xr.Dataset({'geopotential': ('z', rng.random(8))}),
-    })
+    dt = xr.DataTree.from_dict(
+        {
+            'surface': xr.Dataset({'temperature': ('x', rng.random(4))}),
+            'upper_air': xr.Dataset({'geopotential': ('z', rng.random(8))}),
+        }
+    )
     assert xarray_snapshot == dt
 ```
 

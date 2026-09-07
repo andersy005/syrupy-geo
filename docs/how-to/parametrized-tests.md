@@ -10,10 +10,10 @@ import pytest
 import xarray as xr
 
 
-@pytest.mark.parametrize("size", [4, 8, 16])
+@pytest.mark.parametrize('size', [4, 8, 16])
 def test_array_by_size(xarray_snapshot, size):
     rng = np.random.default_rng(42)
-    da = xr.DataArray(rng.random((size, size)), dims=["x", "y"])
+    da = xr.DataArray(rng.random((size, size)), dims=['x', 'y'])
     assert xarray_snapshot == da
 ```
 
@@ -30,8 +30,8 @@ test_climate/test_array_by_size_16
 Use separate `parametrize` decorators for independent axes. This keeps the parametrization clear and avoids having to reason about the full product manually:
 
 ```python
-@pytest.mark.parametrize("crs", ["EPSG:4326", "EPSG:3857"])
-@pytest.mark.parametrize("n_points", [10, 100])
+@pytest.mark.parametrize('crs', ['EPSG:4326', 'EPSG:3857'])
+@pytest.mark.parametrize('n_points', [10, 100])
 def test_points_snapshot(geodataframe_snapshot, n_points, crs):
     import geopandas as gpd
     from shapely.geometry import Point
@@ -39,7 +39,7 @@ def test_points_snapshot(geodataframe_snapshot, n_points, crs):
     rng = np.random.default_rng(42)
     coords = rng.random((n_points, 2))
     gdf = gpd.GeoDataFrame(
-        {"value": np.arange(n_points)},
+        {'value': np.arange(n_points)},
         geometry=[Point(x, y) for x, y in coords],
         crs=crs,
     )
