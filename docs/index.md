@@ -27,12 +27,13 @@ Python 3.12 or later is required.
 ```python
 # No conftest.py changes needed. The fixtures are registered automatically.
 
+
 def test_my_array(xarray_snapshot):
     import numpy as np
     import xarray as xr
 
     rng = np.random.default_rng(42)
-    da = xr.DataArray(rng.random((3, 4)), dims=["x", "y"])
+    da = xr.DataArray(rng.random((3, 4)), dims=['x', 'y'])
     assert xarray_snapshot == da  # snapshot on the left
 
 
@@ -41,10 +42,12 @@ def test_my_datatree(xarray_snapshot):
     import xarray as xr
 
     rng = np.random.default_rng(42)
-    dt = xr.DataTree.from_dict({
-        'temperature': xr.Dataset({'t': ('x', rng.random(4))}),
-        'precipitation': xr.Dataset({'p': ('y', rng.random(3))}),
-    })
+    dt = xr.DataTree.from_dict(
+        {
+            'temperature': xr.Dataset({'t': ('x', rng.random(4))}),
+            'precipitation': xr.Dataset({'p': ('y', rng.random(3))}),
+        }
+    )
     assert xarray_snapshot == dt  # snapshot on the left
 
 
@@ -53,9 +56,9 @@ def test_my_geodataframe(geodataframe_snapshot):
     from shapely.geometry import Point
 
     gdf = gpd.GeoDataFrame(
-        {"value": [1, 2, 3]},
+        {'value': [1, 2, 3]},
         geometry=[Point(0, 0), Point(1, 1), Point(2, 2)],
-        crs="EPSG:4326",
+        crs='EPSG:4326',
     )
     assert geodataframe_snapshot == gdf  # snapshot on the left
 ```
