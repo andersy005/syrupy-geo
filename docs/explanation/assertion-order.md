@@ -5,15 +5,15 @@
 Always write snapshot assertions with the snapshot fixture on the left:
 
 ```python
-assert xarray_snapshot == my_dataarray   # correct
-assert geodataframe_snapshot == my_gdf   # correct
+assert xarray_snapshot == my_dataarray  # correct
+assert geodataframe_snapshot == my_gdf  # correct
 ```
 
 Never write them the other way around:
 
 ```python
-assert my_dataarray == xarray_snapshot   # wrong, silent false positive
-assert my_gdf == geodataframe_snapshot   # wrong, silent false positive
+assert my_dataarray == xarray_snapshot  # wrong, silent false positive
+assert my_gdf == geodataframe_snapshot  # wrong, silent false positive
 ```
 
 ## Why the wrong order is dangerous

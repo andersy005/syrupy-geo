@@ -26,9 +26,9 @@ from shapely.geometry import Point
 
 def test_places_snapshot(geodataframe_snapshot):
     gdf = gpd.GeoDataFrame(
-        {"name": ["A", "B", "C"], "value": [10, 20, 30]},
+        {'name': ['A', 'B', 'C'], 'value': [10, 20, 30]},
         geometry=[Point(0, 0), Point(1, 1), Point(2, 2)],
-        crs="EPSG:4326",
+        crs='EPSG:4326',
     )
     assert geodataframe_snapshot == gdf
 ```
