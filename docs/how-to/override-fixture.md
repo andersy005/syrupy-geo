@@ -13,9 +13,9 @@ from syrupy_geo import XarraySnapshotExtension
 
 @pytest.fixture
 def xarray_snapshot(snapshot, tmp_path):
-    os.environ["SNAPSHOT_STORAGE_PATH"] = str(tmp_path / "snapshots")
+    os.environ['SNAPSHOT_STORAGE_PATH'] = str(tmp_path / 'snapshots')
     yield snapshot.use_extension(XarraySnapshotExtension)
-    del os.environ["SNAPSHOT_STORAGE_PATH"]
+    del os.environ['SNAPSHOT_STORAGE_PATH']
 ```
 
 Tests in `tests/heavy/` now write snapshots to a temporary directory. Tests in all other directories continue to use the default location.
